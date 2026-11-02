@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapping the Michelin Sky</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Home page -->
+  <header id="hero">
+    <svg id="constellation" viewBox="0 0 500 500"></svg>
+    <div>
+      <p class="eyebrow">A data story about taste, culture &amp; who decides</p>
+      <h1>Mapping the <em>Michelin</em> Sky</h1>
+      <p class="lede">
+        A Michelin star is one of the most coveted honors in food. But what does the
+        map of "great food" actually look like - and whose cooking gets to shine on it?
+      </p>
+      <p class="lede">
+        <span class="gold">★</span> worth a stop<br />
+        <span class="gold">★★</span> worth a detour<br />
+        <span class="gold">★★★</span> worth a special journey
+      </p>
+    </div>
+  </header>
+
+  <!-- Chapter 1: world map -->
+  <section id="chapter-1">
+    <p class="eyebrow">Chapter 1 - The global sky</p>
+    <h2><span class="gold" id="total">695</span> starred restaurants, one map</h2>
+    <p class="lede">
+      Each dot is a Michelin-starred restaurant from the 2019 guides, placed at its real latitude and
+      longitude. Bigger dots have more stars. Click a dot to see the restaurant.
+    </p>
+
+    <div id="map-wrap">
+      <svg id="map" viewBox="0 0 960 500"></svg>
+      <div id="popup" hidden></div>
+      <p class="legend">
+        <span style="color: #f3e3b5">●</span> 1 star &nbsp;
+        <span style="color: #f6c560">●</span> 2 stars &nbsp;
+        <span style="color: #ff8a4c">●</span> 3 stars
+      </p>
+    </div>
+  </section>
+
+  <footer>
+    Data: <a href="https://www.kaggle.com/datasets/jackywang529/michelin-restaurants">Michelin Restaurants (Kaggle, 2019)</a>.
+    Map: <a href="https://github.com/topojson/world-atlas">world-atlas</a>. Built with D3 v7.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+  <script src="script.js"></script>
+</body>
+</html>
