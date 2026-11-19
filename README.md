@@ -63,7 +63,7 @@ The map shapes are Natural Earth, loaded from [world-atlas](https://github.com/t
 | File | What's in it |
 |---|---|
 | `index.html` | All story text: one `<section class="chapter">` per chapter, each with a `.scrolly` block (a sticky `<figure>` plus `.step` cards) |
-| `style.css` | Design tokens (`:root` colours), the layout with the sticky chart, the mobile layout (below 820px wide) and the reveal animations |
+| `style.css` | Design tokens (`:root` colors), the layout with the sticky chart, the mobile layout (below 820px wide) and the reveal animations |
 | `script.js` | Data cleaning, the scroll engine, and one `draw*` function per chart |
 
 ## How the scrollytelling works (for developers)
@@ -72,5 +72,5 @@ The map shapes are Natural Earth, loaded from [world-atlas](https://github.com/t
 - Each `draw*` function builds its chart once, then registers an `onStep` that changes the chart with D3 transitions (colour, radius, stroke-dashoffset, clip-path width). Scrolling back up plays the steps in reverse.
 - **To add a step:** add a `<div class="step" data-step="N">` in `index.html`, then handle `N` in that chart's `scrolly(...)` callback.
 - **Step text with numbers:** put `<b data-fill="key">` in the HTML and call `fill("key", value)` in JS, or give the element an `id` and set its `innerHTML` from the data.
-- Colours live in two places: CSS variables in `style.css` and the `C` object in `script.js`. Keep them in sync.
+- Colors live in two places: CSS variables in `style.css` and the `C` object in `script.js`. Keep them in sync.
 - Animations turn off when the reader has `prefers-reduced-motion` set (`DUR = 0`).
