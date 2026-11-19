@@ -4,50 +4,215 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapping the Michelin Sky</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Home page -->
-  <header id="hero">
-    <svg id="constellation" viewBox="0 0 500 500"></svg>
-    <div>
-      <p class="header">A data story about taste, culture &amp; who decides</p>
-      <h1>Mapping the <em>Michelin</em> Sky</h1>
-      <p class="lede">
-        A Michelin star is one of the most coveted honors in food. But what does the
-        map of "great food" actually look like - and whose cooking gets to shine on it?
+  <!--
+    Each chapter = intro text + a .scrolly block.
+    .scrolly holds a sticky <figure> (the chart) and .step cards; script.js
+    redraws the chart when a step with data-step="N" reaches mid-screen.
+    Elements with data-fill="key" or an id get numbers filled in from the CSV.
+  -->
+  <div id="progress"></div>
+  <div id="tooltip" hidden></div>
+
+  <!-- ============ HERO ============ -->
+  <header id="hero" class="dark">
+    <canvas id="starfield"></canvas>
+    <div class="wrap">
+      <p class="kicker reveal">A data story &nbsp;·&nbsp; CSE 478</p>
+      <h1 class="reveal">Mapping the<br />Michelin Sky</h1>
+      <p class="hero-lede reveal">
+        A Michelin star is called the highest honour a restaurant can win.
+        We looked at every restaurant in the Michelin Guide to see who actually wins one,
+        and who is never even in the running.
       </p>
-      <p class="lede">
-        <span class="gold">★</span> worth a stop<br />
-        <span class="gold">★★</span> worth a detour<br />
-        <span class="gold">★★★</span> worth a special journey
-      </p>
+      <hr />
+      <div class="stats">
+        <div class="stat reveal"><span class="big" data-count="N">0</span><span>restaurants in the dataset</span></div>
+        <div class="stat reveal"><span class="big" data-count="TOT">0</span><span>stars awarded</span></div>
+        <div class="stat reveal"><span class="big" data-count="NC">0</span><span>countries covered</span></div>
+        <div class="stat reveal alert"><span class="big">0</span><span>of them in Africa</span></div>
+      </div>
+      <p class="scrollcue">scroll &nbsp;↓</p>
     </div>
   </header>
 
-  <section id="section-1">
-    <p class="header"> The global sky</p>
-    <h2><span class="gold" id="total">695</span> starred restaurants, one map</h2>
-    <p class="lede">
-      Each dot is a Michelin-starred restaurant from the 2019 guides, placed at its real latitude and
-      longitude. Bigger dots have more stars. Click a dot to see the restaurant.
-    </p>
-
-    <div id="map-wrap">
-      <svg id="map" viewBox="0 0 960 500"></svg>
-      <div id="popup" hidden></div>
-      <p class="legend">
-        <span style="color: #f3e3b5">●</span> 1 star &nbsp;
-        <span style="color: #f6c560">●</span> 2 stars &nbsp;
-        <span style="color: #ff8a4c">●</span> 3 stars
+  <!-- ============ 1 WAFFLE ============ -->
+  <section class="chapter" id="s1">
+    <div class="wrap intro">
+      <p class="kicker reveal">1 &nbsp;·&nbsp; What a star means</p>
+      <h2 class="reveal" id="h1">Only a few in every 100 restaurants<br />in the Guide have three stars</h2>
+      <p class="deck reveal">
+        Michelin gives restaurants one, two or three stars, and each level is a different promise.
+        Almost half of the restaurants in the Guide are recommended but get no star at all.
       </p>
+    </div>
+    <div class="scrolly wrap">
+      <figure class="sticky card">
+        <svg id="waffle"></svg>
+        <div id="waffle-legend" class="legend-list"></div>
+      </figure>
+      <div class="steps">
+        <div class="step" data-step="0">
+          <p class="step-k">1,000 squares</p>
+          <p>Here is the whole Guide, shrunk to 1,000 squares. Each square stands for about <b data-fill="per">8</b> restaurants.</p>
+        </div>
+        <div class="step" data-step="1">
+          <p class="step-k"><span class="s3">★★★</span> Exceptional cuisine</p>
+          <p><i>"Worth a special journey."</i> Three-star restaurants fill just <b data-fill="c3">21</b> squares, about one row of the grid.</p>
+        </div>
+        <div class="step" data-step="2">
+          <p class="step-k"><span class="s2">★★</span> Excellent cooking</p>
+          <p><i>"Worth a detour."</i> Two stars add <b data-fill="c2">71</b> more squares.</p>
+        </div>
+        <div class="step" data-step="3">
+          <p class="step-k"><span class="s1">★</span> High-quality cooking</p>
+          <p><i>"Worth a stop."</i> One star is where most starred restaurants sit: <b data-fill="c1">415</b> squares.</p>
+        </div>
+        <div class="step" data-step="4">
+          <p class="step-k"><span class="bib">●</span> Bib Gourmand, no star</p>
+          <p>The rest are recommended for good food at a fair price, but get no star. That's <b data-fill="c0">493</b> squares, almost half the Guide.</p>
+        </div>
+      </div>
+    </div>
+    <p class="note wrap" id="n1"></p>
+  </section>
+
+  <!-- ============ 2 TREE ============ -->
+  <section class="chapter" id="s2">
+    <div class="wrap intro">
+      <p class="kicker reveal">2 &nbsp;·&nbsp; How a star is given</p>
+      <h2 class="reveal" id="h2">Secret inspectors decide, and about half<br />of the restaurants in the Guide never get a star</h2>
+      <p class="deck reveal">
+        Restaurants cannot apply for a star. Anonymous inspectors eat there several times, pay their own bill and decide as a team.
+        They judge only the food. This tree follows every restaurant in the dataset to where it ends up. Thicker branches hold more restaurants.
+      </p>
+      <p class="mini-k reveal">The 5 things inspectors judge</p>
+      <ol class="criteria reveal">
+        <li>Ingredient quality</li><li>Cooking skill</li><li>Chef's personality</li><li>Value for money</li><li>Same quality every visit</li>
+      </ol>
+    </div>
+    <div class="scrolly wrap">
+      <figure class="sticky">
+        <svg id="tree"></svg>
+      </figure>
+      <div class="steps">
+        <div class="step" data-step="0"><p class="step-k">The Guide</p><p>Every restaurant starts in the same place: <b data-fill="N">7,709</b> restaurants the inspectors chose to include.</p></div>
+        <div class="step" data-step="1"><p class="step-k">The first cut</p><p>Only <b data-fill="pctStar">51%</b> come away with a star. The rest get a Bib Gourmand: good food at a fair price, but no star.</p></div>
+        <div class="step" data-step="2"><p class="step-k">How many stars?</p><p>Starred restaurants split again. Most get one. Very few get three.</p></div>
+        <div class="step" data-step="3"><p class="step-k">Where they end up</p><p>Follow each branch to the three countries with the most restaurants at that level. <b>Click a star level</b> to open or close it.</p></div>
+      </div>
+    </div>
+    <p class="note wrap">Source: Michelin Guide restaurants dataset (Kaggle). Criteria: guide.michelin.com.</p>
+  </section>
+
+  <!-- ============ 3 CONSTELLATIONS ============ -->
+  <section class="chapter dark" id="s3">
+    <div class="wrap intro">
+      <p class="kicker reveal">3 &nbsp;·&nbsp; Where the stars are</p>
+      <h2 class="reveal">Some cuisines travel the world,<br />and their stars form constellations</h2>
+      <p class="deck reveal">
+        Each glowing point is a country where restaurants of one cuisine hold Michelin stars. Bigger points hold more.
+        Lines join each point to its nearest neighbours, the way a star chart joins stars into a constellation.
+      </p>
+    </div>
+    <div class="scrolly wrap">
+      <figure class="sticky card-dark">
+        <div class="chips" id="chips"><span class="mini-k">Pick a cuisine</span></div>
+        <div class="map-head"><h3 id="cons-title">Japanese</h3><p id="cons-sub"></p></div>
+        <svg id="cons"></svg>
+        <div class="map-legend">
+          <span><i class="dot home"></i>home country of the cuisine</span>
+          <span><i class="dot away"></i>other country with stars for it</span>
+          <span>point size = number of starred restaurants</span>
+        </div>
+      </figure>
+      <div class="steps">
+        <div class="step" data-step="0" data-cuisine="Japanese"><p class="step-k">Japanese</p><p id="cs-Japanese"></p></div>
+        <div class="step" data-step="1" data-cuisine="French"><p class="step-k">French</p><p id="cs-French"></p></div>
+        <div class="step" data-step="2" data-cuisine="Chinese"><p class="step-k">Chinese</p><p id="cs-Chinese"></p></div>
+        <div class="step" data-step="3" data-cuisine="Italian"><p class="step-k">Italian</p><p id="cs-Italian"></p><p class="hint">Hover a point to see its restaurants, or pick another cuisine above.</p></div>
+      </div>
+    </div>
+    <p class="note wrap">
+      Source: Michelin Guide restaurants dataset (Kaggle). Cuisine = first cuisine tag. Each point sits at the average location of that cuisine's starred restaurants in the country.
+      Inside France most starred kitchens are tagged "Modern" or "Creative", so the French constellation only shows restaurants tagged "French".
+    </p>
+  </section>
+
+  <!-- ============ 4 SANKEY ============ -->
+  <section class="chapter" id="s4">
+    <div class="wrap intro">
+      <p class="kicker reveal">4 &nbsp;·&nbsp; What a star costs</p>
+      <h2 class="reveal">Follow the money:<br />the stars flow from the most expensive tables</h2>
+      <p class="deck reveal">
+        On the left, every restaurant in the dataset sorted by price, from $ (cheapest) to $$$$.
+        On the right, the award it got. Each band is a group of restaurants. The thicker the band, the more restaurants.
+      </p>
+    </div>
+    <div class="scrolly wrap">
+      <figure class="sticky">
+        <svg id="sankey"></svg>
+      </figure>
+      <div class="steps">
+        <div class="step" data-step="0"><p class="step-k">Price on the left, award on the right</p><p>Each price group is about the same size, so cheap and expensive restaurants are both well covered.</p></div>
+        <div class="step" data-step="1" data-award="3"><p class="step-k"><span class="s3">★★★</span> Three stars</p><p id="sk3"></p></div>
+        <div class="step" data-step="2" data-award="2"><p class="step-k"><span class="s2">★★</span> Two stars</p><p id="sk2"></p></div>
+        <div class="step" data-step="3" data-award="1"><p class="step-k"><span class="s1">★</span> One star</p><p id="sk1"></p></div>
+        <div class="step" data-step="4" data-award="0"><p class="step-k">No star</p><p id="sk0"></p><p class="hint">Hover a band to see how many restaurants it holds.</p></div>
+      </div>
+    </div>
+    <p class="note wrap">Source: Michelin Guide restaurants dataset (Kaggle). Price uses each country's own currency symbol ($ € ¥ ฿), mapped to groups 1 to 4.</p>
+  </section>
+
+  <!-- ============ 5 CIRCLE PACKING ============ -->
+  <section class="chapter" id="s5">
+    <div class="wrap intro">
+      <p class="kicker reveal">5 &nbsp;·&nbsp; Who is left out</p>
+      <h2 class="reveal" id="h5">Europe holds 2 of every 3 Michelin stars.<br />Africa holds none.</h2>
+      <p class="deck reveal" id="d5">Each big circle is a part of the world, and each circle inside it is one country. Circle area shows how many stars it holds.</p>
+    </div>
+    <div class="scrolly wrap">
+      <figure class="sticky">
+        <svg id="pack"></svg>
+      </figure>
+      <div class="steps">
+        <div class="step" data-step="0"><p class="step-k">Europe</p><p id="pk0"></p></div>
+        <div class="step" data-step="1"><p class="step-k">The rest of the world</p><p id="pk1"></p></div>
+        <div class="step" data-step="2"><p class="step-k">France alone</p><p id="pk2"></p></div>
+        <div class="step" data-step="3"><p class="step-k alert">And Africa?</p><p>No African country is in the Guide. Not one restaurant, not one star, on a continent of 1.5 billion people.</p><p class="hint">Hover a circle for that country's top restaurants.</p></div>
+      </div>
+    </div>
+    <p class="note wrap">Source: Michelin Guide restaurants dataset (Kaggle). Countries grouped into UN world regions. Darker circle = more stars.</p>
+  </section>
+
+  <!-- ============ ENDING ============ -->
+  <section id="end" class="dark">
+    <div class="wrap center">
+      <h2 class="reveal huge">But is that enough?</h2>
+      <p class="deck reveal">
+        Stars do reward excellent cooking. But they shine mostly in Europe, mostly in a few rich cities,
+        and mostly on the most expensive tables. Most of the world's kitchens are never even looked at.
+        Can a prize that most of the world cannot win really tell us where the best food is?
+      </p>
+      <div class="poll reveal">
+        <p class="mini-k">What does a Michelin star really mean to you?</p>
+        <div class="poll-options">
+          <button data-vote="best">The best cooking in the world</button>
+          <button data-vote="looked">The best cooking Michelin chose to look at</button>
+          <button data-vote="price">Expensive fine dining</button>
+        </div>
+        <p id="poll-result"></p>
+      </div>
     </div>
   </section>
 
-  <footer>
-    Data: <a href="https://www.kaggle.com/datasets/jackywang529/michelin-restaurants">Michelin Restaurants (Kaggle, 2019)</a>.
-    Map: <a href="https://github.com/topojson/world-atlas">world-atlas</a>. Built with D3 v7.
+  <footer class="wrap">
+    <p id="foot"></p>
+    <p>CSE 478 · Ashley Yang, Caleb Burbank, Iris Lai, Michael Zavlunov, Shanali Islam</p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
